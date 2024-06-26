@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -10,11 +5,106 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
+
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  imageUrl  String?  @default("")
+  teacherOf String?  @default("")
+  classes   String[] @default([])
+  subjects  String[] @default([])
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Student23 {
+  id           Int         @id @default(autoincrement())
+  level        String
+  variant      String?
+  gender       String?
+  password     String
+  name         String
+  username     String      @unique
+  surname      String
+  attendanceId Int
+  attendance   Attendance  @relation(fields: [attendanceId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Student24 {
+  id           Int         @id @default(autoincrement())
+  level        String
+  variant      String?
+  gender       String?
+  password     String
+  name         String
+  username     String      @unique
+  surname      String
+  attendanceId Int
+  attendance   Attendance  @relation(fields: [attendanceId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Attendance {
+  id           Int         @id @default(autoincrement())
+  totalPresent Int         @default(0)
+  totalAbsent  Int         @default(0)
+  presentDates DateTime[]
+  absentDates  DateTime[]
+  student23    Student23[]
+  student24    Student24[]
+}
+
+model TimeTable {
+  id      Int      @id @default(autoincrement())
+  level   String
+  subject String
+  time    String
+  date    String
+}
+
+model ThirdTerms23 {
+  id         Int       @id @default(autoincrement())
+  studentId  Int
+  subjects   Subject[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([studentId], map: "studentId23")
+}
+
+model FirstTerms24 {
+  id         Int       @id @default(autoincrement())
+  studentId  Int
+  subjects   Subject[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([studentId], map: "studentId24")
+}
+
+model Subject {
+  id           Int       @id @default(autoincrement())
+  subjectName  String
+  firstCA      Int?
+  secondCA     Int?
+  project      Int?
+  assignment   Int?
+  exam         Int?
+  thirdTerms23 ThirdTerms23? @relation(fields: [thirdTerms23Id], references: [id])
+  firstTerms24 FirstTerms24? @relation(fields: [firstTerms24Id], references: [id])
+  thirdTerms23Id Int?
+  firstTerms24Id Int?
+}
+
+enum Role {
+  ADMIN
+  USER
 }

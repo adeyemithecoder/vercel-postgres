@@ -8,7 +8,6 @@ export default function Home() {
   useEffect(() => {
     const fetchUsers = async () => {
       const res = await axios.get("/api/create");
-      console.log(res.data);
       setUsers(res.data);
     };
     fetchUsers();

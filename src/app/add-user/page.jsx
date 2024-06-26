@@ -2,46 +2,82 @@
 import axios from "axios";
 import { useState } from "react";
 
-export default function AddUser() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-
-  console.log("object");
+const Home = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [teacherOf, setTeacherOf] = useState("");
+  const [classes, setClasses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await axios.post("/api/create", { email, name });
-    console.log("res=", res);
-    if (res.status == "201") {
-      alert("User added successfully");
-      setEmail("");
-      setName("");
-    } else {
-      alert("Error adding user");
+    try {
+      const { data } = await axios.post("/api/create", {
+        username,
+        password,
+        imageUrl,
+        teacherOf,
+        classes,
+        subjects,
+      });
+      if (data.status == 409) {
+        alert(data.message);
+        return;
+      }
+      console.log(data.message);
+      alert(data.message);
+    } catch (err) {
+      console.log(err);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Email:</label>
-        <input
-          type='email'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <div>
-        <label>Name:</label>
+    <div>
+      <h1>Create User</h1>
+      <form onSubmit={handleSubmit}>
         <input
           type='text'
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          placeholder='Username'
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
-      </div>
-      <button type='submit'>Add User</button>
-    </form>
+        <input
+          type='password'
+          placeholder='Password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <input
+          type='text'
+          placeholder='Image URL'
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+        />
+        <input
+          type='text'
+          placeholder='Teacher Of'
+          value={teacherOf}
+          onChange={(e) => setTeacherOf(e.target.value)}
+        />
+        <input
+          type='text'
+          placeholder='Classes (comma separated)'
+          value={classes}
+          onChange={(e) => setClasses(e.target.value.split(","))}
+        />
+        <input
+          type='text'
+          placeholder='Subjects (comma separated)'
+          value={subjects}
+          onChange={(e) => setSubjects(e.target.value.split(","))}
+        />
+        <button type='submit'>Create User</button>
+      </form>
+    </div>
   );
-}
+};
+
+export default Home;
